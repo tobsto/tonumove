@@ -8,6 +8,15 @@ import shutil
 def main():
     descr = """
     Script for adding folders with mp3 files or a single file to Tonuino sd card folder in the right format
+
+    Usage for adding a single folder or a single file to the Tonuino
+
+        ./tonumove.py <input-folder-or-file> -o <mount-point-of-sd-card>
+
+    Usage for adding a folder containing multiple folder with mp3 to the Tonuino
+
+        ./tonumove.py <input-folder-containing-subfolders-with-mp3-files> -o <mount-point-of-sd-card> --superfolder
+
     """
     parser = argparse.ArgumentParser(description=descr,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -88,8 +97,8 @@ def checkSanity(sdcard):
                 if not str.isdigit(s[0]) and str.isdigit(s[1]):
                     print('Warning: Subfolder %s has non-digit characters' % s)
                     return False
-                if not int(s) >= 0 and int(s) < 256:
-                    print('Warning: Subfolder %s number is not between 1 and 255' % s)
+                if not int(s) > 0 and not int(s) < 100:
+                    print('Warning: Subfolder %s number is not between 1 and 99' % s)
                     return False
         if n > 0:
             for f in files:
@@ -102,6 +111,9 @@ def checkSanity(sdcard):
                     return False
                 if not str.isdigit(track[0]) and str.isdigit(track[1]) and str.isdigit(track[2]):
                     print('Warning: File %s in folder %s is not comprised of digits' % (f, folder))
+                    return False
+                if not int(track) > 0 and not int(track) < 256:
+                    print('Warning: File %s in folder %s is not digits between 1 and 255' % (f, folder))
                     return False
     return True
 
@@ -134,7 +146,7 @@ def copy2Tonuino(input, output):
         ifiles = [input]
 
     # get unused folder
-    foldernames = ['%02i/' % n for n in range(maxNFolders)]
+    foldernames = ['%02i/' % n for n in range(1, maxNFolders)]
     foldersExists = [os.path.exists(os.path.join(output, name)) for name in foldernames]
     if all(foldersExists):
         print("Error: All %i folders exists. Free up space by removing at least one folder" % maxNFolders)
@@ -149,6 +161,7 @@ def copy2Tonuino(input, output):
         dest = os.path.join(foldername, "%03i.mp3" % (n + 1))
         print("%s->%s" % (src, dest))
         shutil.copy(src, dest)
+    # check for correct format
     if not checkSanity(output):
         print("Warning content of sd-card does not meet format requirements. Please check")
 

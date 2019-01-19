@@ -25,3 +25,28 @@ optional arguments:
 
 
 
+Examples:
+--------
+
+Suppose we have the following file structure on our computer
+
+    forTonuino/
+        |- BibiBocksberg/
+                |- Bibi01.mp3
+                |- Bibi02.mp3
+                |- Bibi03.mp3
+        |- OmaSpricht.mp3
+        |- KarlssonVomDach/
+                |- Karlsson01.mp3
+                |- Karlsson02.mp3
+                |- Karlsson03.mp3
+
+and the card is mounted at ``/mnt/sdcard``
+Then we can add the folder ``BibiBlocksberg`` by 
+
+    ./tonumove.py forTonuino/BibiBlockberg -o /mnt/sdcard/
+
+We can move the whole content of ``forTonuino`` to the sd card by
+
+    ./tonumove.py forTonuino/ -o /mnt/sdcard/ --superfolder
+
