@@ -9,7 +9,7 @@ import logging
 def setUpLogger(logfile):
     logger = logging.getLogger('Tonumove')
     logger.setLevel(logging.INFO)
-    fh = logging.FileHandler(logfile, 'w')
+    fh = logging.FileHandler(logfile, 'a')
     ch = logging.StreamHandler()
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
