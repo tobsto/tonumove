@@ -22,6 +22,8 @@ optional arguments:
                           input files (each copied to a differnent destination
                           folder (default: False)
     --overwrite           Clear sd-card before copying (default: False)
+    --fixFileOrder        Fix order of files (experimental) (default: False)
+
 
 
 
@@ -50,3 +52,20 @@ We can move the whole content of ``forTonuino`` to the sd card by
 
     ./tonumove.py forTonuino/ -o /mnt/sdcard/ --superfolder
 
+
+The experimental fixing of the file order works for files like this:
+
+    |- BibiBocksberg/
+            |- Bibi - 10 - Folge1.mp3
+            |- Bibi - 1 - Folge1.mp3
+            |- Bibi - 2 - Folge1.mp3
+            |- Bibi - 3 - Folge1.mp3
+            |- Bibi - 4 - Folge1.mp3
+            |- Bibi - 5 - Folge1.mp3
+            |- Bibi - 6 - Folge1.mp3
+            |- Bibi - 7 - Folge1.mp3
+            |- Bibi - 8 - Folge1.mp3
+            |- Bibi - 9 - Folge1.mp3
+
+With ``--fixFileOrder`` enabled the track 10 will be moved to the end where it belongs.
+However, this feature does not work for files without digits or files with not digits (cf. #1)
