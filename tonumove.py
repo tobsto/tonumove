@@ -41,6 +41,7 @@ def main():
     parser.add_argument("--superfolder", action='store_true', help='Input if folder which contains multiple folders or input files (each copied to a differnent destination folder')
     parser.add_argument("--overwrite", action='store_true', help='Clear sd-card before copying')
     parser.add_argument("--logfile", default='tonumove.log', help='Log file', type=str)
+    parser.add_argument("--fixFileOrder", action='store_true', help='Fix order of files (experimental)')
 
     args = parser.parse_args()
 
@@ -58,7 +59,7 @@ def main():
                     shutil.rmtree(f)
 
     if not args.superfolder:
-        copy2Tonuino(args.input, args.output)
+        copy2Tonuino(args.input, args.output, args.fixFileOrder)
     else:
         for folder, subfolders, files in os.walk(args.input):
             notRoot = folder is not args.input
@@ -67,13 +68,13 @@ def main():
                 for f in files:
                     print(f)
                     logger.info('Processing %s' % f)
-                    result = copy2Tonuino(os.path.join(folder, f), args.output)
+                    result = copy2Tonuino(os.path.join(folder, f), args.output, args.fixFileOrder)
                     if result != 0:
                         logger.error('Error while processing %s. Abort.' % f)
                         return
             elif notRoot and hasMp3:
                 logger.info('Processing %s' % folder)
-                result = copy2Tonuino(folder, args.output)
+                result = copy2Tonuino(folder, args.output, args.fixFileOrder)
                 if result != 0:
                     logger.error('Error while processing %s. Abort.' % folder)
                     return
@@ -101,7 +102,7 @@ def fixFileOrder(files):
         while str.isdigit(f[lp + i]):
             i = i + 1
             if i > 10:
-                raise RunTimeError('Error while extracting track number')
+                raise RuntimeError('Error while extracting track number')
         trackNumbers.append(int(f[lp:lp + i]))
         trackNumberWidths.append(i)
     trackNumberWidth = max(trackNumberWidths)
@@ -148,7 +149,7 @@ def checkSanity(sdcard):
     return True
 
 
-def copy2Tonuino(input, output):
+def copy2Tonuino(input, output, fixOrder=False):
     """
     copy folders with mp3 files or a single file to Tonuino sd card folder in the right format
 
@@ -164,7 +165,9 @@ def copy2Tonuino(input, output):
     ifiles = []
     if os.path.isdir(input):
         ifiles = sorted([f for f in os.listdir(input) if f.endswith('.mp3')])
-        ifiles_fixed = fixFileOrder(ifiles)
+        ifiles_fixed = ifiles
+        if fixOrder:
+            ifiles_fixed = fixFileOrder(ifiles)
         ifiles = [f for _, f in sorted(zip(ifiles_fixed, ifiles))]
 
         if len(ifiles) == 0:
